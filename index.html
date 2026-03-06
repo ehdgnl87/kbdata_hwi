@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <!-- 모바일 최우선 및 핀치 줌(확대/축소) 허용 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>영업/마케팅 성과 대시보드</title>
+    <style>
+        /* [1. 테마 컬러 및 기본 설정] */
+        :root {
+            --bg-white: #FFFFFF;
+            --text-black: #222222;
+            --accent-magenta: #E20074; /* 프로페셔널한 마젠타 톤 */
+            --border-gray: #E0E0E0;
+            --header-pink: #FCE4EC; /* 연한 핑크 */
+            --zebra-gray: #F9F9F9;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-white);
+            color: var(--text-black);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* [2. 보안 (간단한 로그인 화면)] */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            background-color: var(--zebra-gray);
+        }
+
+        .login-box {
+            background: var(--bg-white);
+            padding: 40px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            border: 1px solid var(--border-gray);
+        }
+
+        .login-box h2 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            color: var(--accent-magenta);
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            font-size: 1rem;
+            text-align: center;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: var(--accent-magenta);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-magenta);
+            color: var(--bg-white);
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .login-box button:hover {
+            background-color: #C20062;
+        }
+
+        /* [3. 대시보드 메인 화면] */
+        #dashboard-screen {
+            display: none; /* 로그인 성공 전까지 숨김 */
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-gray);
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.5rem;
+            color: var(--text-black);
+        }
+
+        /* [4. 지표 그리드 UI (최상단 1~9)] */
+        .indicator-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .indicator-btn {
+            padding: 12px 5px;
+            background-color: var(--bg-white);
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            color: var(--text-black);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .indicator-btn:hover {
+            background-color: var(--zebra-gray);
+        }
+
+        .indicator-btn.active {
+            background-color: var(--accent-magenta);
+            color: var(--bg-white);
+            border-color: var(--accent-magenta);
+        }
+
+        /* [5. 데이터 표시 영역 및 탭 UI] */
+        #data-display-area {
+            border: 1px solid var(--border-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-white);
+        }
+
+        .display-title {
+            text-align: center;
+            padding: 15px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-magenta);
+            border-bottom: 1px solid var(--border-gray);
+            background-color: var(--zebra-gray);
+            margin: 0;
+        }
+
+        .tabs {
+            display: flex;
+            background-color: var(--zebra-gray);
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 0;
+            text-align: center;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #777;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--accent-magenta);
+            border-bottom: 3px solid var(--accent-magenta);
+            background-color: var(--bg-white);
+        }
+
+        .tab-content {
+            padding: 0; /* 내부 테이블 컨테이너가 꽉 차도록 0으로 설정 */
+        }
+
+        /* [6. 테이블 검색(필터) 및 엑셀 형태 데이터 테이블] */
+        .filter-container {
+            padding: 10px 15px;
+            background-color: var(--zebra-gray);
+            border-bottom: 1px solid var(--border-gray);
+        }
+
+        .filter-container input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+            background-color: var(--bg-white);
+        }
+
+        .filter-container input:focus {
+            border-color: var(--accent-magenta);
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto; /* 가로 스크롤 허용 */
+            -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
+            border: 1px solid var(--border-gray);
+            max-height: 400px; /* 세로 스크롤 허용 */
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            min-width: 500px; /* 열이 찌그러지지 않도록 최소 너비 지정 */
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px 8px;
+            border: 1px solid var(--border-gray);
+            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+        }
+
+        th {
+            background-color: var(--header-pink); /* 연한 핑크 배경 */
+            color: var(--text-black);
+            font-weight: bold;
+            position: sticky; /* 상단 헤더 고정 */
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border-gray);
+        }
+
+        /* Zebra stripe 행 배경색 */
+        tbody tr:nth-child(even) {
+            background-color: var(--zebra-gray);
+        }
+
+        /* 터치 시 행 강조 (선택된 행 배경) */
+        tbody tr:active {
+            background-color: var(--header-pink);
+        }
+
+        /* 로딩 스피너 및 에러 메시지 */
+        .loader {
+            text-align: center;
+            padding: 20px;
+            color: var(--accent-magenta);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 로그인 화면 -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2>대시보드 접속</h2>
+            <input type="password" id="password-input" placeholder="비밀번호를 입력하세요" onkeypress="handleEnter(event)">
+            <button onclick="checkPassword()">확인</button>
+        </div>
+    </div>
+
+    <!-- 메인 대시보드 화면 -->
+    <div id="dashboard-screen">
+        <div class="dashboard-header">
+            <h1>📊고객경험 활동지표_경북</h1>
+        </div>
+
+        <!-- 최상단 지표 1~9 선택 버튼 (그리드) -->
+        <div class="indicator-grid" id="indicator-buttons">
+            <!-- 자바스크립트로 1~9번 버튼 자동 생성 -->
+        </div>
+
+        <!-- 선택된 지표의 데이터 표시 영역 -->
+        <div id="data-display-area">
+            <h2 class="display-title" id="current-indicator-title">지표 1 매출현황</h2>
+            
+            <div class="tabs">
+                <button class="tab-btn active" id="btn-team" onclick="switchTab('team')">코드별</button>
+                <button class="tab-btn" id="btn-store" onclick="switchTab('store')">POS별</button>
+            </div>
+            
+            <!-- 테이블 검색(필터) 영역 -->
+            <div class="filter-container">
+                <input type="text" id="table-filter" placeholder="🔍 여러 검색어는 띄어쓰기로 입력 (예: 강남 110%)" onkeyup="filterTable()">
+            </div>
+            
+            <div class="tab-content" id="table-render-area">
+                <div class="loader">데이터를 불러오는 중입니다...</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 설정 영역 (비밀번호 및 구글 시트 URL)
+        // ==========================================
+        
+        // 대시보드 접속 비밀번호 설정 (원하시는 번호로 변경하세요)
+        const DASHBOARD_PASSWORD = "1234"; 
+
+        // [중요] 1~9번 지표의 버튼 이름을 원하시는 대로 설정하세요.
+        const INDICATOR_NAMES = {
+            1: "U+One",
+            2: "매장운영표준",
+            3: "AX DX역량레벨",
+            4: "타사등록/자사전환",
+            5: "무체험",
+            6: "t-NPS",
+            7: "스마트CS",
+            8: "AI헬프데스크",
+            9: "요금시뮬레이터"
+        };
+
+        // [중요] 1~9번 지표별 팀/매장 CSV 링크 설정
+        // 실제 사용할 시트 URL을 아래 형식에 맞춰 넣어주세요.
+        // 주의: '/edit?usp=sharing' 형태의 공유 링크는 작동하지 않습니다. 
+        // 반드시 '파일 > 공유 > 웹에 게시 > CSV'를 선택해 나온 '/pub?output=csv' 링크를 넣어야 합니다.
+        const SHEET_URLS = {
+            1: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv" },
+            2: { team: "YOUR_GOOGLE_SHEET_CSV_URL_2_TEAM", store: "YOUR_GOOGLE_SHEET_CSV_URL_2_STORE" },
+            3: { team: "YOUR_GOOGLE_SHEET_CSV_URL_3_TEAM", store: "YOUR_GOOGLE_SHEET_CSV_URL_3_STORE" },
+            4: { team: "", store: "" },
+            5: { team: "", store: "" },
+            6: { team: "", store: "" },
+            7: { team: "", store: "" },
+            8: { team: "", store: "" },
+            9: { team: "", store: "" },
+        };
+
+        // [추가] 지표 및 탭별 열 너비(간격) 커스텀 설정
+        // 배열의 순서대로 1열, 2열, 3열... 의 너비를 의미합니다. (% 또는 px 사용 가능)
+        // 특정 열의 너비를 지정하면 해당 열은 글자가 길 때 짤리지 않고 자동으로 줄바꿈 처리됩니다.
+        // 설정을 원치 않는 지표나 탭은 아예 적지 않거나 빈 배열 [] 로 두시면 자동(auto)으로 맞춰집니다.
+        const COLUMN_WIDTHS = {
+            1: { 
+                team: ["30%", "20%", "20%", "30%"], // 예: 1번 지표 '코드별'의 1~5열 너비 비율 지정
+                store: ["20%", "auto", "auto", "10%", "10%", "10%"] // 예: 1번 지표 'POS별' 너비 (px 지정도 가능)
+            },
+            2: {
+                team: ["15%", "40%", "15%", "15%", "15%"],
+                store: []
+            }
+            // 3~9번도 커스텀이 필요하다면 아래에 같은 형식으로 추가하세요.
+        };
+
+        // [추가] 조건부 서식 (목표값 미만 빨간색 강조) 설정
+        // 지표와 탭별로 '열 인덱스(0부터 시작) : 목표값' 형태로 설정합니다.
+        // 첫 번째 열은 0, 두 번째 열은 1... 다섯 번째 열(달성률)은 4 입니다.
+        const TARGET_RULES = {
+            1: {
+                // 수정됨: 값에 %를 빼고 순수 숫자만 입력해야 합니다. (자바스크립트 문법 오류 방지)
+                team: { 3: 86 }, // 1번 지표 코드별: 5번째 열(달성률)이 86 미만이면 빨간색 적용
+                store: { 5: 86 }
+            },
+            2: {
+                team: { 3: 5000, 4: 95 } // 여러 열 동시 적용 예시: 4번째 열 5000 미만 & 5번째 열 95 미만
+            }
+        };
+
+        // ==========================================
+        // 2. 보안 및 로그인 로직
+        // ==========================================
+        function checkPassword() {
+            const input = document.getElementById('password-input').value;
+            if (input === DASHBOARD_PASSWORD) {
+                // 비밀번호 일치 시 화면 전환
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+                initDashboard(); // 대시보드 화면 생성 및 1번 지표 로드
+            } else {
+                alert('비밀번호가 일치하지 않습니다.');
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        function handleEnter(e) {
+            if (e.key === 'Enter') checkPassword();
+        }
+
+        // ==========================================
+        // 3. UI 인터랙션 로직 (그리드 & 탭)
+        // ==========================================
+        
+        let currentIndicator = 1;
+        let currentTab = 'team'; // 'team' 또는 'store'
+
+        // 대시보드 초기 세팅 (버튼 1~9 생성 및 초기 로드)
+        function initDashboard() {
+            const grid = document.getElementById('indicator-buttons');
+            grid.innerHTML = '';
+            for (let i = 1; i <= 9; i++) {
+                const btn = document.createElement('button');
+                btn.className = `indicator-btn ${i === 1 ? 'active' : ''}`;
+                // 설정해둔 이름이 있으면 사용하고, 없으면 '지표 N'으로 표시
+                btn.innerText = INDICATOR_NAMES[i] || `지표 ${i}`;
+                btn.onclick = () => selectIndicator(i);
+                grid.appendChild(btn);
+            }
+            selectIndicator(1);
+        }
+
+        function selectIndicator(indicatorId) {
+            currentIndicator = indicatorId;
+            
+            // 버튼 활성화 상태 변경
+            const buttons = document.querySelectorAll('.indicator-btn');
+            buttons.forEach((btn, index) => {
+                if (index + 1 === indicatorId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            // 데이터 표시 영역 타이틀 변경
+            const indicatorName = INDICATOR_NAMES[indicatorId] || `지표 ${indicatorId}`;
+            document.getElementById('current-indicator-title').innerText = `📊 ${indicatorName} 상세 데이터`;
+
+            // 선택된 탭(팀/매장) 상태를 유지하면서 해당 지표의 데이터를 불러옵니다.
+            fetchSheetData();
+        }
+
+        function switchTab(tabType) {
+            currentTab = tabType;
+            
+            // 탭 버튼 활성화 변경
+            document.getElementById('btn-team').classList.toggle('active', tabType === 'team');
+            document.getElementById('btn-store').classList.toggle('active', tabType === 'store');
+
+            // 탭 변경 시 데이터 다시 불러오기
+            fetchSheetData();
+        }
+
+        // ==========================================
+        // 4. 구글 시트 연동 및 테이블 렌더링 로직
+        // ==========================================
+
+        async function fetchSheetData() {
+            const container = document.getElementById('table-render-area');
+            container.innerHTML = `<div class="loader">데이터를 불러오는 중입니다...</div>`;
+
+            // 데이터 로드 시 필터 검색창 초기화
+            document.getElementById('table-filter').value = '';
+
+            // 현재 선택된 지표(1~9)와 탭(team/store)에 해당하는 URL 가져오기
+            const url = SHEET_URLS[currentIndicator]?.[currentTab];
+            
+            try {
+                let csvText = "";
+
+                // 실제 URL이 비어있거나 구글 시트 주소가 아닐 경우 더미 데이터로 임시 구동
+                if (!url || url.includes("YOUR_GOOGLE_SHEET_CSV_URL") || url === "") {
+                    await new Promise(resolve => setTimeout(resolve, 300)); // 자연스러운 로딩 효과
+                    csvText = generateDummyData(currentIndicator, currentTab);
+                
+                // [오류 수정] 사용자가 일반 '공유' 링크를 넣었을 때의 예외 처리
+                } else if (url.includes("/edit")) {
+                    throw new Error("⚠️ 일반 공유 링크(/edit)가 입력되었습니다.<br><br>구글 시트 상단 메뉴에서 <b>[파일] > [공유] > [웹에 게시]</b>를 선택하신 후, <b>'CSV'</b> 형식의 링크를 복사해서 넣어주세요.");
+                
+                } else {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error('네트워크 응답이 정상이 아닙니다.');
+                    csvText = await response.text();
+                }
+
+                // 테이블 렌더링 시 현재 지표(1~9)와 탭(team/store) 정보도 함께 넘겨줍니다.
+                renderTable(container, csvText, currentIndicator, currentTab);
+
+            } catch (error) {
+                console.error('데이터를 불러오는 중 오류 발생:', error);
+                
+                let errorMsg = "데이터를 불러오는데 실패했습니다. URL을 확인해주세요.";
+                
+                // 에러 종류에 따른 상세 안내 메시지
+                if (error.message.includes("일반 공유 링크")) {
+                    errorMsg = error.message;
+                } else if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
+                    errorMsg = "⚠️ 네트워크 오류 또는 CORS 에러입니다.<br>링크가 <b>'웹에 게시(CSV)'</b>로 올바르게 생성되었는지 확인해주세요.";
+                }
+
+                container.innerHTML = `
+                    <div class="loader" style="color:#D32F2F; font-size:0.95rem; line-height:1.5; padding: 30px 10px;">
+                        ${errorMsg}
+                    </div>`;
+            }
+        }
+
+        // 예시 구동을 위한 더미 데이터 생성기 (지표 버튼을 누를 때마다 숫자가 바뀌도록 처리)
+        function generateDummyData(indicator, tab) {
+            const isTeam = tab === 'team';
+            const header = isTeam ? "순위,조직명(팀),목표(만원),실적(만원),달성률" : "순위,조직명(매장),목표(만원),실적(만원),달성률";
+            const orgName1 = isTeam ? "강남영업1팀" : "강남본점";
+            const orgName2 = isTeam ? "강북영업2팀" : "홍대점";
+            const orgName3 = isTeam ? "경기남부팀" : "수원역점";
+
+            // 지표 번호에 따라 실적값이 다르게 보이게 조작
+            const mult = indicator * 1000;
+
+            return `${header}\n1,${orgName1},${5000 + mult},${5500 + mult},110%\n2,${orgName2},${4500 + mult},${4200 + mult},93%\n3,${orgName3},${6000 + mult},${5800 + mult},96%`;
+        }
+
+        function renderTable(container, csvText, indicator, tab) {
+            // 현재 지표와 탭에 설정된 열 너비 배열 가져오기 (없으면 빈 배열 반환)
+            const widths = COLUMN_WIDTHS[indicator]?.[tab] || [];
+            // [추가] 현재 지표와 탭에 설정된 목표값 규칙 가져오기
+            const targetRules = TARGET_RULES[indicator]?.[tab] || {};
+
+            // 줄바꿈으로 행 분리 (구글 시트 CSV 파싱)
+            const rows = csvText.split('\n').filter(row => row.trim() !== '');
+            
+            let html = '<div class="table-container"><table>';
+            
+            rows.forEach((row, index) => {
+                // 쉼표로 열 분리 (CSV 데이터 내에 쉼표가 포함된 문자열 처리는 단순 분리로 완벽하지 않을 수 있으나 기본 동작에는 문제없음)
+                const columns = row.split(',');
+                
+                if (index === 0) {
+                    // 첫 번째 줄은 헤더(th)로 처리
+                    html += '<thead><tr>';
+                    columns.forEach((col, colIdx) => { 
+                        // 설정된 너비가 있으면 style로 적용하고, 글자가 길면 줄바꿈 되도록 설정
+                        const w = widths[colIdx];
+                        const style = w ? `style="width: ${w}; min-width: ${w}; white-space: normal; word-break: keep-all;"` : '';
+                        html += `<th ${style}>${col.trim()}</th>`; 
+                    });
+                    html += '</tr></thead><tbody>';
+                } else {
+                    // 나머지는 본문(td) 처리
+                    html += '<tr>';
+                    columns.forEach((col, colIdx) => { 
+                        let styles = [];
+                        
+                        // 1. 헤더 너비에 맞춰 본문 열도 줄바꿈 허용
+                        if (widths[colIdx]) {
+                            styles.push('white-space: normal; word-break: keep-all;');
+                        }
+                        
+                        // 2. [추가] 목표값 미만인지 확인하여 빨간색 강조 적용
+                        const targetValue = targetRules[colIdx];
+                        if (targetValue !== undefined) {
+                            // 콤마(,)나 퍼센트(%) 기호 등을 제거하고 순수 숫자로 변환하여 비교
+                            const numValue = parseFloat(col.replace(/[^0-9.-]+/g, ''));
+                            if (!isNaN(numValue) && numValue < targetValue) {
+                                styles.push('color: #D32F2F; font-weight: bold;'); // 빨간색 및 볼드 처리
+                            }
+                        }
+                        
+                        const styleAttr = styles.length > 0 ? `style="${styles.join(' ')}"` : '';
+                        html += `<td ${styleAttr}>${col.trim()}</td>`; 
+                    });
+                    html += '</tr>';
+                }
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        // ==========================================
+        // 5. 테이블 검색(필터) 로직 (다중 키워드 AND 조건)
+        // ==========================================
+        function filterTable() {
+            const input = document.getElementById("table-filter");
+            // 입력값을 소문자로 변환한 뒤, 띄어쓰기(공백)를 기준으로 나누어 배열로 만듭니다. (빈 검색어는 제거)
+            const keywords = input.value.toLowerCase().split(' ').filter(word => word.trim() !== '');
+            const tableBody = document.querySelector("#table-render-area table tbody");
+            
+            if (!tableBody) return; // 테이블이 렌더링되기 전이면 무시
+            
+            const rows = tableBody.getElementsByTagName("tr");
+
+            // 모든 행(Row)을 돌면서 검색어 포함 여부 확인
+            for (let i = 0; i < rows.length; i++) {
+                const rowText = (rows[i].textContent || rows[i].innerText).toLowerCase();
+                let isMatch = true; // 기본적으로 일치한다고 가정
+
+                // 사용자가 입력한 여러 개의 키워드를 하나씩 검사
+                for (let j = 0; j < keywords.length; j++) {
+                    // 키워드 중 하나라도 행 내용에 포함되어 있지 않으면 매칭 실패(false)
+                    if (rowText.indexOf(keywords[j]) === -1) {
+                        isMatch = false;
+                        break; // 더 이상 검사할 필요 없이 반복문 탈출
+                    }
+                }
+                
+                // 모든 키워드가 포함되어 있으면(isMatch가 true) 보여주고, 아니면 숨김
+                if (isMatch) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>
