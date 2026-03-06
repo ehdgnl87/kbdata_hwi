@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <!-- 모바일 최우선 및 핀치 줌(확대/축소) 허용 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>영업/마케팅 성과 대시보드</title>
+    <title>고객경험 활동지표(경북)</title>
     <style>
         /* [1. 테마 컬러 및 기본 설정] */
         :root {
@@ -114,16 +114,18 @@
         .indicator-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px; /* 모바일 최적화를 위해 간격 살짝 축소 */
             margin-bottom: 20px;
         }
 
         .indicator-btn {
-            padding: 12px 5px;
+            padding: 10px 2px; /* 가로 패딩을 줄여서 공간 확보 */
             background-color: var(--bg-white);
             border: 1px solid var(--border-gray);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: clamp(0.6rem, 2.6vw, 0.95rem); /* 화면 비율에 맞춰 폰트 크기 자동 축소 */
+            white-space: nowrap; /* 텍스트 줄바꿈 강제 방지 */
+            letter-spacing: -0.5px; /* 자간 축소로 더 많은 글자 수용 */
             font-weight: bold;
             color: var(--text-black);
             cursor: pointer;
@@ -213,25 +215,28 @@
 
         .table-container {
             width: 100%;
-            overflow-x: auto; /* 가로 스크롤 허용 */
-            -webkit-overflow-scrolling: touch; /* 모바일 부드러운 스크롤 */
+            overflow-x: auto; /* 만약을 위한 가로 스크롤 (기본적으로 발생하지 않음) */
+            -webkit-overflow-scrolling: touch; 
             border: 1px solid var(--border-gray);
-            max-height: 400px; /* 세로 스크롤 허용 */
+            max-height: 400px; 
             overflow-y: auto;
         }
 
         table {
             width: 100%;
-            min-width: 500px; /* 열이 찌그러지지 않도록 최소 너비 지정 */
+            /* min-width: 500px; (제거됨: 화면 밖으로 밀려나는 원인) */
+            table-layout: fixed; /* 화면 비율에 맞춰 강제로 표 너비 배분 (스크롤 방지) */
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: clamp(0.6rem, 2.2vw, 0.85rem); /* 표 폰트도 화면 폭에 비례하여 축소 */
             text-align: center;
         }
 
         th, td {
-            padding: 10px 8px;
+            padding: 8px 2px; /* 패딩을 최소화하여 데이터 공간 확보 */
             border: 1px solid var(--border-gray);
-            white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+            white-space: normal; /* 긴 텍스트는 유연하게 처리 */
+            word-break: keep-all; /* 단어가 잘리지 않게 깔끔하게 처리 */
+            letter-spacing: -0.5px; /* 데이터 자간 축소 */
         }
 
         th {
@@ -531,9 +536,9 @@
                     // 첫 번째 줄은 헤더(th)로 처리
                     html += '<thead><tr>';
                     columns.forEach((col, colIdx) => { 
-                        // 설정된 너비가 있으면 style로 적용하고, 글자가 길면 줄바꿈 되도록 설정
+                        // 설정된 너비가 있으면 style로 적용 (min-width 속성을 빼서 화면 밖으로 삐져나가는 현상 방지)
                         const w = widths[colIdx];
-                        const style = w ? `style="width: ${w}; min-width: ${w}; white-space: normal; word-break: keep-all;"` : '';
+                        const style = w ? `style="width: ${w}; white-space: normal; word-break: keep-all;"` : '';
                         html += `<th ${style}>${col.trim()}</th>`; 
                     });
                     html += '</tr></thead><tbody>';
@@ -608,3 +613,4 @@
     </script>
 </body>
 </html>
+
