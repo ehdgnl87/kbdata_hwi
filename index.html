@@ -201,15 +201,15 @@
 
         .summary-table-wrapper {
             width: 100%;
-            overflow-x: auto;
+            overflow-x: hidden; /* [수정] 한눈에 보이도록 가로 스크롤 방지 */
             border-radius: 4px;
         }
 
         .summary-table-wrapper table {
             width: 100%;
-            table-layout: auto; 
+            table-layout: fixed; /* [수정] 내용 길이에 상관없이 화면 비율에 맞춰 강제로 표 너비 배분 */
             border-collapse: collapse;
-            font-size: 0.75rem; 
+            font-size: 0.75rem; /* 서브 표이므로 글씨를 조금 더 작게 */
             text-align: center;
             white-space: nowrap;
         }
