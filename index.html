@@ -143,29 +143,103 @@
             border-color: var(--accent-magenta);
         }
 
-        /* [5. 데이터 표시 영역 및 탭 UI] */
+        /* [5. 선택된 지표 강조 배너 및 데이터 표시 영역] */
+        .selected-indicator-banner {
+            background: var(--zebra-gray); 
+            color: var(--text-black); 
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+            border: 1px solid var(--border-gray); 
+        }
+
+        .selected-indicator-banner .badge {
+            background-color: var(--accent-magenta); 
+            color: var(--bg-white); 
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .selected-indicator-banner h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: bold;
+            letter-spacing: -0.5px;
+            word-break: keep-all;
+        }
+
+        /* 서브 데이터 요약 카드 스타일 */
+        .summary-card {
+            background-color: var(--bg-white);
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            width: 100%;
+            display: none; 
+            color: var(--text-black);
+            position: relative;
+        }
+
+        .summary-card-title {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--accent-magenta);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .summary-table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        .summary-table-wrapper table {
+            width: 100%;
+            table-layout: auto; 
+            border-collapse: collapse;
+            font-size: 0.75rem; 
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .summary-table-wrapper th, .summary-table-wrapper td {
+            padding: 6px 8px;
+            border: 1px solid var(--border-gray);
+        }
+
+        /* 서브 데이터 요약 카드의 헤더는 메인 헤더 밑으로 숨지 않도록 고정 해제 */
+        .summary-table-wrapper th {
+            background-color: #FFF0F5; 
+            color: var(--accent-magenta);
+            font-weight: bold;
+            position: static; 
+        }
+
+        /* [수정] sticky 고정을 위해 overflow: hidden 삭제 */
         #data-display-area {
             border: 1px solid var(--border-gray);
             border-radius: 8px;
-            overflow: hidden;
+            /* overflow: hidden 삭제 (sticky 정상 작동 위함) */
             background: var(--bg-white);
-        }
-
-        .display-title {
-            text-align: center;
-            padding: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: var(--accent-magenta);
-            border-bottom: 1px solid var(--border-gray);
-            background-color: var(--zebra-gray);
-            margin: 0;
         }
 
         .tabs {
             display: flex;
             background-color: var(--zebra-gray);
             border-bottom: 1px solid var(--border-gray);
+            border-radius: 8px 8px 0 0; /* 부모 overflow 삭제에 대비해 탭 상단 모서리 둥글게 복구 */
         }
 
         .tab-btn {
@@ -188,10 +262,9 @@
         }
 
         .tab-content {
-            padding: 0; /* 내부 테이블 컨테이너가 꽉 차도록 0으로 설정 */
+            padding: 0; 
         }
 
-        /* [6. 테이블 검색(필터) 및 엑셀 형태 데이터 테이블] */
         .filter-container {
             padding: 10px 15px;
             background-color: var(--zebra-gray);
@@ -213,58 +286,102 @@
             border-color: var(--accent-magenta);
         }
 
+        /* [수정] sticky 고정을 위해 가로 스크롤(overflow-x: auto) 삭제 (Shrink-to-fit으로 넘치지 않음) */
         .table-container {
             width: 100%;
-            overflow-x: auto; /* 만약을 위한 가로 스크롤 (기본적으로 발생하지 않음) */
-            -webkit-overflow-scrolling: touch; 
-            border: 1px solid var(--border-gray);
-            max-height: 400px; 
-            overflow-y: auto;
         }
 
         table {
             width: 100%;
-            /* min-width: 500px; (제거됨: 화면 밖으로 밀려나는 원인) */
-            table-layout: fixed; /* 화면 비율에 맞춰 강제로 표 너비 배분 (스크롤 방지) */
+            table-layout: fixed; 
             border-collapse: collapse;
-            font-size: clamp(0.6rem, 2.2vw, 0.85rem); /* 표 폰트도 화면 폭에 비례하여 축소 */
+            font-size: clamp(0.6rem, 2.2vw, 0.85rem); 
             text-align: center;
         }
 
         th, td {
-            padding: 8px 2px; /* 패딩을 최소화하여 데이터 공간 확보 */
+            padding: 8px 2px;
             border: 1px solid var(--border-gray);
-            white-space: normal; /* 긴 텍스트는 유연하게 처리 */
-            word-break: keep-all; /* 단어가 잘리지 않게 깔끔하게 처리 */
-            letter-spacing: -0.5px; /* 데이터 자간 축소 */
+            white-space: nowrap; 
+            letter-spacing: -0.5px;
         }
 
+        /* [수정] 메인 표 헤더 완벽 틀 고정 설정 */
         th {
-            background-color: var(--header-pink); /* 연한 핑크 배경 */
+            background-color: var(--header-pink); 
             color: var(--text-black);
             font-weight: bold;
-            position: sticky; /* 상단 헤더 고정 */
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 1px 0 var(--border-gray);
+            position: sticky; /* 틀 고정 마법의 속성 */
+            top: 0; /* 최상단에 붙음 */
+            z-index: 10; 
+            /* 스크롤 시 데이터와 구분되도록 헤더 하단 그림자 강화 */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
         }
 
-        /* Zebra stripe 행 배경색 */
+        /* 텍스트 동적 축소(Shrink-to-fit) 래퍼 */
+        .fit-wrapper {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; 
+        }
+
+        .fit-content {
+            display: inline-block;
+            white-space: nowrap; 
+            transform-origin: center center; 
+            transition: transform 0.2s ease-out; 
+        }
+
         tbody tr:nth-child(even) {
             background-color: var(--zebra-gray);
         }
 
-        /* 터치 시 행 강조 (선택된 행 배경) */
         tbody tr:active {
             background-color: var(--header-pink);
         }
 
-        /* 로딩 스피너 및 에러 메시지 */
         .loader {
             text-align: center;
             padding: 20px;
             color: var(--accent-magenta);
             font-weight: bold;
+        }
+
+        #scrollTopBtn {
+            display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 20px;
+            z-index: 99;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            outline: none;
+            background-color: var(--accent-magenta);
+            color: white;
+            cursor: pointer;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #scrollTopBtn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #scrollTopBtn:hover {
+            background-color: #C20062;
+            transform: translateY(-3px);
         }
     </style>
 </head>
@@ -290,10 +407,22 @@
             <!-- 자바스크립트로 1~9번 버튼 자동 생성 -->
         </div>
 
+        <!-- 선택된 지표 강조 배너 영역 -->
+        <div class="selected-indicator-banner">
+            <span class="badge">현재 선택된 지표</span>
+            <h2 id="current-indicator-title">지표 1</h2>
+            
+            <!-- 뱃지 아래 서브 데이터 (요약표) 영역 -->
+            <div id="summary-card" class="summary-card">
+                <div class="summary-card-title">💡 담당/영업팀 요약</div>
+                <div id="summary-render-area" class="summary-table-wrapper">
+                    <!-- 서브 테이블 렌더링 -->
+                </div>
+            </div>
+        </div>
+
         <!-- 선택된 지표의 데이터 표시 영역 -->
         <div id="data-display-area">
-            <h2 class="display-title" id="current-indicator-title">지표 1 매출현황</h2>
-            
             <div class="tabs">
                 <button class="tab-btn active" id="btn-team" onclick="switchTab('team')">코드별</button>
                 <button class="tab-btn" id="btn-store" onclick="switchTab('store')">POS별</button>
@@ -301,7 +430,7 @@
             
             <!-- 테이블 검색(필터) 영역 -->
             <div class="filter-container">
-                <input type="text" id="table-filter" placeholder="🔍 여러 검색어는 띄어쓰기로 입력 (예: 강남 110%)" onkeyup="filterTable()">
+                <input type="text" id="table-filter" placeholder="🔍 여러 검색어는 띄어쓰기 입력(예:대구 직영점)" onkeyup="filterTable()">
             </div>
             
             <div class="tab-content" id="table-render-area">
@@ -311,15 +440,16 @@
 
     </div>
 
+    <!-- 맨 위로 가기 버튼 -->
+    <button id="scrollTopBtn" onclick="scrollToTop()" title="맨 위로 가기">↑</button>
+
     <script>
         // ==========================================
         // 1. 설정 영역 (비밀번호 및 구글 시트 URL)
         // ==========================================
         
-        // 대시보드 접속 비밀번호 설정 (원하시는 번호로 변경하세요)
         const DASHBOARD_PASSWORD = "1234"; 
 
-        // [중요] 1~9번 지표의 버튼 이름을 원하시는 대로 설정하세요.
         const INDICATOR_NAMES = {
             1: "U+One",
             2: "매장운영표준",
@@ -332,50 +462,92 @@
             9: "요금시뮬레이터"
         };
 
-        // [중요] 1~9번 지표별 팀/매장 CSV 링크 설정
-        // 실제 사용할 시트 URL을 아래 형식에 맞춰 넣어주세요.
-        // 주의: '/edit?usp=sharing' 형태의 공유 링크는 작동하지 않습니다. 
-        // 반드시 '파일 > 공유 > 웹에 게시 > CSV'를 선택해 나온 '/pub?output=csv' 링크를 넣어야 합니다.
         const SHEET_URLS = {
-            1: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv" },
-            2: { team: "YOUR_GOOGLE_SHEET_CSV_URL_2_TEAM", store: "YOUR_GOOGLE_SHEET_CSV_URL_2_STORE" },
-            3: { team: "YOUR_GOOGLE_SHEET_CSV_URL_3_TEAM", store: "YOUR_GOOGLE_SHEET_CSV_URL_3_STORE" },
-            4: { team: "", store: "" },
-            5: { team: "", store: "" },
-            6: { team: "", store: "" },
-            7: { team: "", store: "" },
-            8: { team: "", store: "" },
-            9: { team: "", store: "" },
+            1: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A10:E37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=A1:F101" },
+            2: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=G10:K37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=H1:M101" },
+            3: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=m10:x37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=O1:AA101" },
+            4: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=z10:AE37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AC1:AI101" },
+            5: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A39:G66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AK1:AR101" },
+            6: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=I39:P66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AT1:BB101" },
+            7: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=R39:V66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BD1:BI101" },
+            8: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=X39:AB66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BK1:BP101" },
+            9: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=AD39:AH66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BR1:BW101" },
         };
 
-        // [추가] 지표 및 탭별 열 너비(간격) 커스텀 설정
-        // 배열의 순서대로 1열, 2열, 3열... 의 너비를 의미합니다. (% 또는 px 사용 가능)
-        // 특정 열의 너비를 지정하면 해당 열은 글자가 길 때 짤리지 않고 자동으로 줄바꿈 처리됩니다.
-        // 설정을 원치 않는 지표나 탭은 아예 적지 않거나 빈 배열 [] 로 두시면 자동(auto)으로 맞춰집니다.
+        const SECONDARY_SHEET_URLS = {
+            1: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=A1:H12", 
+            2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=J1:O12",
+            3: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=Q1:X12",
+            4: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=A14:I25",
+            5: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=K14:P25",
+            6: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=R14:X25",
+            7: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=A27:D38",
+            8: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=F27:I38",
+            9: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=K27:N38"
+        };
+
+        const SECONDARY_HEADER_STYLES = {
+            1: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' }, 
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' } 
+            ],
+            2: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 6, bg: '#F2F2F2', color: '#222222' }
+            ],
+            3: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' }
+            ],
+            4: [
+                { start: 1, end: 5, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 6, end: 9, bg: '#F2F2F2', color: '#222222' }
+            ],
+            5: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' }
+            ],
+            6: [
+                { start: 1, end: 5, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 6, end: 7, bg: '#F2F2F2', color: '#222222' }
+            ],
+            7: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' }
+            ],
+            8: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' }
+            ],
+            9: [
+                { start: 1, end: 4, bg: '#FFF0F5', color: 'var(--accent-magenta)' },
+                { start: 5, end: 8, bg: '#F2F2F2', color: '#222222' }
+            ]
+        };
+
         const COLUMN_WIDTHS = {
-            1: { 
-                team: ["30%", "20%", "20%", "30%"], // 예: 1번 지표 '코드별'의 1~5열 너비 비율 지정
-                store: ["20%", "auto", "auto", "10%", "10%", "10%"] // 예: 1번 지표 'POS별' 너비 (px 지정도 가능)
+            1: { team: ["10%", "15%", "15%", "15%","15%"], store: ["10%", "15%", "20%", "15%", "15%", "15%"] },
+            2: { team: ["10%", "15%", "15%", "15%", "15%"], store: ["10%", "15%", "15%", "15%", "15%", "15%"] },
+            3: {
+                team: ["10%", "15%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%"],
+                store: ["10%", "15%", "15%","6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%"]
             },
-            2: {
-                team: ["15%", "40%", "15%", "15%", "15%"],
-                store: []
-            }
-            // 3~9번도 커스텀이 필요하다면 아래에 같은 형식으로 추가하세요.
+            4: { team: ["15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"] },
+            5: { team: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%", "15%"] },
+            6: { team: ["15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"], store: ["15%", "15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"] },
+            7: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] },
+            8: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] },
+            9: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] }
         };
 
-        // [추가] 조건부 서식 (목표값 미만 빨간색 강조) 설정
-        // 지표와 탭별로 '열 인덱스(0부터 시작) : 목표값' 형태로 설정합니다.
-        // 첫 번째 열은 0, 두 번째 열은 1... 다섯 번째 열(달성률)은 4 입니다.
         const TARGET_RULES = {
-            1: {
-                // 수정됨: 값에 %를 빼고 순수 숫자만 입력해야 합니다. (자바스크립트 문법 오류 방지)
-                team: { 3: 86 }, // 1번 지표 코드별: 5번째 열(달성률)이 86 미만이면 빨간색 적용
-                store: { 5: 86 }
-            },
-            2: {
-                team: { 3: 5000, 4: 95 } // 여러 열 동시 적용 예시: 4번째 열 5000 미만 & 5번째 열 95 미만
-            }
+            1: { team: { 4: { under: 88, over: 100 } }, store: { 5: { under: 88, over: 100 } } },
+            3: { team: { 2: { under: 4, over: 3 } }, store: { 3: { under: 4, over: 3 } } }, 
+            5: { team: { 3: { over: 0 },4: { over: 0 } }, store: { 4: { over: 0 },6: { over: 0 } } },
+            6: { team: { 2: 95 }, store: { 3: 95 } },
+            7: { team: { 4: 55 }, store: { 5: 55 } },
+            8: { team: { 4: 80 }, store: { 5: 80 } },
+            9: { team: { 4: 20 }, store: { 5: 20 } }
         };
 
         // ==========================================
@@ -384,10 +556,9 @@
         function checkPassword() {
             const input = document.getElementById('password-input').value;
             if (input === DASHBOARD_PASSWORD) {
-                // 비밀번호 일치 시 화면 전환
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard-screen').style.display = 'block';
-                initDashboard(); // 대시보드 화면 생성 및 1번 지표 로드
+                initDashboard(); 
             } else {
                 alert('비밀번호가 일치하지 않습니다.');
                 document.getElementById('password-input').value = '';
@@ -403,16 +574,14 @@
         // ==========================================
         
         let currentIndicator = 1;
-        let currentTab = 'team'; // 'team' 또는 'store'
+        let currentTab = 'team'; 
 
-        // 대시보드 초기 세팅 (버튼 1~9 생성 및 초기 로드)
         function initDashboard() {
             const grid = document.getElementById('indicator-buttons');
             grid.innerHTML = '';
             for (let i = 1; i <= 9; i++) {
                 const btn = document.createElement('button');
                 btn.className = `indicator-btn ${i === 1 ? 'active' : ''}`;
-                // 설정해둔 이름이 있으면 사용하고, 없으면 '지표 N'으로 표시
                 btn.innerText = INDICATOR_NAMES[i] || `지표 ${i}`;
                 btn.onclick = () => selectIndicator(i);
                 grid.appendChild(btn);
@@ -423,151 +592,191 @@
         function selectIndicator(indicatorId) {
             currentIndicator = indicatorId;
             
-            // 버튼 활성화 상태 변경
             const buttons = document.querySelectorAll('.indicator-btn');
             buttons.forEach((btn, index) => {
                 if (index + 1 === indicatorId) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
 
-            // 데이터 표시 영역 타이틀 변경
-            const indicatorName = INDICATOR_NAMES[indicatorId] || `지표 ${indicatorId}`;
-            document.getElementById('current-indicator-title').innerText = `📊 ${indicatorName} 상세 데이터`;
+            document.getElementById('current-indicator-title').innerText = INDICATOR_NAMES[indicatorId] || `지표 ${indicatorId}`;
 
-            // 선택된 탭(팀/매장) 상태를 유지하면서 해당 지표의 데이터를 불러옵니다.
             fetchSheetData();
+            fetchSecondaryData(); 
         }
 
         function switchTab(tabType) {
             currentTab = tabType;
             
-            // 탭 버튼 활성화 변경
             document.getElementById('btn-team').classList.toggle('active', tabType === 'team');
             document.getElementById('btn-store').classList.toggle('active', tabType === 'store');
 
-            // 탭 변경 시 데이터 다시 불러오기
             fetchSheetData();
         }
 
         // ==========================================
+        // [핵심] 텍스트 크기 자동 축소 (Shrink-to-fit) 로직
+        // ==========================================
+        function autoFitText() {
+            const wrappers = document.querySelectorAll('.fit-wrapper');
+            wrappers.forEach(wrapper => {
+                const content = wrapper.querySelector('.fit-content');
+                if (!content) return;
+                
+                if (wrapper.clientWidth === 0) return;
+
+                content.style.transform = 'scale(1)';
+                
+                const wrapperWidth = wrapper.clientWidth;
+                const contentWidth = content.scrollWidth;
+                
+                if (contentWidth > wrapperWidth && wrapperWidth > 0) {
+                    const scale = (wrapperWidth / contentWidth) * 0.97;
+                    content.style.transform = `scale(${scale})`;
+                }
+            });
+        }
+
+        window.addEventListener('resize', () => {
+            setTimeout(autoFitText, 50);
+        });
+
+        // ==========================================
         // 4. 구글 시트 연동 및 테이블 렌더링 로직
         // ==========================================
+        function parseCSV(text) {
+            const rows = [];
+            let row = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                if (char === '"' && text[i+1] === '"') {
+                    current += '"'; i++;
+                } else if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    row.push(current); current = '';
+                } else if (char === '\n' && !inQuotes) {
+                    row.push(current);
+                    if (row.join('').trim() !== '') rows.push(row);
+                    row = []; current = '';
+                } else if (char !== '\r') {
+                    current += char;
+                }
+            }
+            if (current || row.length > 0) {
+                row.push(current);
+                if (row.join('').trim() !== '') rows.push(row);
+            }
+            return rows;
+        }
 
         async function fetchSheetData() {
             const container = document.getElementById('table-render-area');
             container.innerHTML = `<div class="loader">데이터를 불러오는 중입니다...</div>`;
-
-            // 데이터 로드 시 필터 검색창 초기화
             document.getElementById('table-filter').value = '';
 
-            // 현재 선택된 지표(1~9)와 탭(team/store)에 해당하는 URL 가져오기
             const url = SHEET_URLS[currentIndicator]?.[currentTab];
             
             try {
                 let csvText = "";
 
-                // 실제 URL이 비어있거나 구글 시트 주소가 아닐 경우 더미 데이터로 임시 구동
                 if (!url || url.includes("YOUR_GOOGLE_SHEET_CSV_URL") || url === "") {
-                    await new Promise(resolve => setTimeout(resolve, 300)); // 자연스러운 로딩 효과
+                    await new Promise(resolve => setTimeout(resolve, 300)); 
                     csvText = generateDummyData(currentIndicator, currentTab);
-                
-                // [오류 수정] 사용자가 일반 '공유' 링크를 넣었을 때의 예외 처리
                 } else if (url.includes("/edit")) {
                     throw new Error("⚠️ 일반 공유 링크(/edit)가 입력되었습니다.<br><br>구글 시트 상단 메뉴에서 <b>[파일] > [공유] > [웹에 게시]</b>를 선택하신 후, <b>'CSV'</b> 형식의 링크를 복사해서 넣어주세요.");
-                
                 } else {
                     const response = await fetch(url);
                     if (!response.ok) throw new Error('네트워크 응답이 정상이 아닙니다.');
                     csvText = await response.text();
                 }
 
-                // 테이블 렌더링 시 현재 지표(1~9)와 탭(team/store) 정보도 함께 넘겨줍니다.
                 renderTable(container, csvText, currentIndicator, currentTab);
+
+                setTimeout(autoFitText, 50);
 
             } catch (error) {
                 console.error('데이터를 불러오는 중 오류 발생:', error);
-                
                 let errorMsg = "데이터를 불러오는데 실패했습니다. URL을 확인해주세요.";
-                
-                // 에러 종류에 따른 상세 안내 메시지
                 if (error.message.includes("일반 공유 링크")) {
                     errorMsg = error.message;
                 } else if (error.name === 'TypeError' && error.message === 'Failed to fetch') {
                     errorMsg = "⚠️ 네트워크 오류 또는 CORS 에러입니다.<br>링크가 <b>'웹에 게시(CSV)'</b>로 올바르게 생성되었는지 확인해주세요.";
                 }
-
-                container.innerHTML = `
-                    <div class="loader" style="color:#D32F2F; font-size:0.95rem; line-height:1.5; padding: 30px 10px;">
-                        ${errorMsg}
-                    </div>`;
+                container.innerHTML = `<div class="loader" style="color:#D32F2F; font-size:0.95rem; line-height:1.5; padding: 30px 10px;">${errorMsg}</div>`;
             }
         }
 
-        // 예시 구동을 위한 더미 데이터 생성기 (지표 버튼을 누를 때마다 숫자가 바뀌도록 처리)
         function generateDummyData(indicator, tab) {
             const isTeam = tab === 'team';
             const header = isTeam ? "순위,조직명(팀),목표(만원),실적(만원),달성률" : "순위,조직명(매장),목표(만원),실적(만원),달성률";
             const orgName1 = isTeam ? "강남영업1팀" : "강남본점";
             const orgName2 = isTeam ? "강북영업2팀" : "홍대점";
             const orgName3 = isTeam ? "경기남부팀" : "수원역점";
-
-            // 지표 번호에 따라 실적값이 다르게 보이게 조작
             const mult = indicator * 1000;
-
             return `${header}\n1,${orgName1},${5000 + mult},${5500 + mult},110%\n2,${orgName2},${4500 + mult},${4200 + mult},93%\n3,${orgName3},${6000 + mult},${5800 + mult},96%`;
         }
 
         function renderTable(container, csvText, indicator, tab) {
-            // 현재 지표와 탭에 설정된 열 너비 배열 가져오기 (없으면 빈 배열 반환)
             const widths = COLUMN_WIDTHS[indicator]?.[tab] || [];
-            // [추가] 현재 지표와 탭에 설정된 목표값 규칙 가져오기
             const targetRules = TARGET_RULES[indicator]?.[tab] || {};
 
-            // 줄바꿈으로 행 분리 (구글 시트 CSV 파싱)
-            const rows = csvText.split('\n').filter(row => row.trim() !== '');
+            const parsedRows = parseCSV(csvText);
+            if(parsedRows.length === 0) return;
+            
+            const headers = parsedRows[0];
+            const bodyRows = parsedRows.slice(1);
             
             let html = '<div class="table-container"><table>';
+            html += '<thead><tr>';
             
-            rows.forEach((row, index) => {
-                // 쉼표로 열 분리 (CSV 데이터 내에 쉼표가 포함된 문자열 처리는 단순 분리로 완벽하지 않을 수 있으나 기본 동작에는 문제없음)
-                const columns = row.split(',');
+            headers.forEach((col, colIdx) => { 
+                const w = widths[colIdx];
+                const style = w ? `style="width: ${w};"` : '';
                 
-                if (index === 0) {
-                    // 첫 번째 줄은 헤더(th)로 처리
-                    html += '<thead><tr>';
-                    columns.forEach((col, colIdx) => { 
-                        // 설정된 너비가 있으면 style로 적용 (min-width 속성을 빼서 화면 밖으로 삐져나가는 현상 방지)
-                        const w = widths[colIdx];
-                        const style = w ? `style="width: ${w}; white-space: normal; word-break: keep-all;"` : '';
-                        html += `<th ${style}>${col.trim()}</th>`; 
-                    });
-                    html += '</tr></thead><tbody>';
-                } else {
-                    // 나머지는 본문(td) 처리
-                    html += '<tr>';
-                    columns.forEach((col, colIdx) => { 
-                        let styles = [];
-                        
-                        // 1. 헤더 너비에 맞춰 본문 열도 줄바꿈 허용
-                        if (widths[colIdx]) {
-                            styles.push('white-space: normal; word-break: keep-all;');
-                        }
-                        
-                        // 2. [추가] 목표값 미만인지 확인하여 빨간색 강조 적용
-                        const targetValue = targetRules[colIdx];
-                        if (targetValue !== undefined) {
-                            // 콤마(,)나 퍼센트(%) 기호 등을 제거하고 순수 숫자로 변환하여 비교
-                            const numValue = parseFloat(col.replace(/[^0-9.-]+/g, ''));
-                            if (!isNaN(numValue) && numValue < targetValue) {
-                                styles.push('color: #D32F2F; font-weight: bold;'); // 빨간색 및 볼드 처리
+                html += `<th ${style}>
+                            <div class="fit-wrapper"><span class="fit-content th-title">${col.trim()}</span></div>
+                         </th>`; 
+            });
+            
+            html += '</tr></thead><tbody id="table-body">';
+            
+            bodyRows.forEach(columns => {
+                html += '<tr>';
+                columns.forEach((col, colIdx) => { 
+                    let styles = [];
+                    
+                    const targetRule = targetRules[colIdx];
+                    if (targetRule !== undefined && col) {
+                        const numValue = parseFloat(col.replace(/[^0-9.-]+/g, ''));
+                        if (!isNaN(numValue)) {
+                            let underVal = undefined;
+                            let overVal = undefined;
+
+                            if (typeof targetRule === 'number') {
+                                underVal = targetRule;
+                            } else {
+                                underVal = targetRule.under;
+                                overVal = targetRule.over;
+                            }
+
+                            if (underVal !== undefined && numValue < underVal) {
+                                styles.push('color: #D32F2F; font-weight: bold;'); 
+                            } else if (overVal !== undefined && numValue > overVal) {
+                                // [수정완료] 초과 시 파란색 강조 
+                                styles.push('color: #1976D2; font-weight: bold;'); 
                             }
                         }
-                        
-                        const styleAttr = styles.length > 0 ? `style="${styles.join(' ')}"` : '';
-                        html += `<td ${styleAttr}>${col.trim()}</td>`; 
-                    });
-                    html += '</tr>';
-                }
+                    }
+                    
+                    const styleAttr = styles.length > 0 ? `style="${styles.join(' ')}"` : '';
+                    
+                    html += `<td ${styleAttr}>
+                                <div class="fit-wrapper"><span class="fit-content">${col ? col.trim() : ''}</span></div>
+                             </td>`; 
+                });
+                html += '</tr>';
             });
 
             html += '</tbody></table></div>';
@@ -575,42 +784,153 @@
         }
 
         // ==========================================
-        // 5. 테이블 검색(필터) 로직 (다중 키워드 AND 조건)
+        // [추가] 서브 데이터(요약표) 불러오기 로직
+        // ==========================================
+        async function fetchSecondaryData() {
+            const card = document.getElementById('summary-card');
+            const container = document.getElementById('summary-render-area');
+            const url = SECONDARY_SHEET_URLS[currentIndicator];
+
+            if (!url || url.trim() === "") {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = 'block';
+            container.innerHTML = `<div class="loader" style="font-size:0.8rem; padding:10px;">요약 데이터를 불러오는 중...</div>`;
+
+            try {
+                if (url.includes("/edit")) throw new Error("잘못된 링크");
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('네트워크 에러');
+                const csvText = await response.text();
+                
+                const rows = parseCSV(csvText);
+                if(rows.length === 0) {
+                    container.innerHTML = ''; return;
+                }
+
+                const headerRules = SECONDARY_HEADER_STYLES[currentIndicator] || [];
+
+                let html = '<table><thead><tr>';
+                const headers = rows[0];
+                
+                headers.forEach((col, colIdx) => { 
+                    let thStyle = '';
+                    let currentColumn = colIdx + 1; 
+
+                    for (let rule of headerRules) {
+                        if (currentColumn >= rule.start && currentColumn <= rule.end) {
+                            if (rule.bg) thStyle += `background-color: ${rule.bg}; `;
+                            if (rule.color) thStyle += `color: ${rule.color}; `;
+                            break;
+                        }
+                    }
+
+                    const styleAttr = thStyle ? `style="${thStyle}"` : '';
+                    
+                    // 요약표 헤더 자동 축소 래퍼 적용
+                    html += `<th ${styleAttr}>
+                                <div class="fit-wrapper"><span class="fit-content">${col.trim()}</span></div>
+                             </th>`; 
+                });
+                
+                html += '</tr></thead><tbody>';
+
+                for(let i = 1; i < rows.length; i++) {
+                    let trStyle = '';
+                    if (i === 1) {
+                        trStyle = 'background-color: #888888; color: #FFFFFF;'; 
+                    }
+
+                    html += `<tr style="${trStyle}">`;
+                    
+                    rows[i].forEach((col, colIdx) => { 
+                        let tdStyle = '';
+                        
+                        if (colIdx === 0 && (i === 6 || (i >= 9 && i <= 11))) {
+                            tdStyle = 'font-weight: 900;'; 
+                        }
+
+                        // 요약표 본문 자동 축소 래퍼 적용
+                        html += `<td style="${tdStyle}">
+                                    <div class="fit-wrapper"><span class="fit-content">${col ? col.trim() : ''}</span></div>
+                                 </td>`; 
+                    });
+                    
+                    html += '</tr>';
+
+                    if (i === 8) {
+                        html += `<tr style="height: 12px; background-color: var(--bg-white);">
+                                    <td colspan="${headers.length}" style="border: none !important;"></td>
+                                 </tr>`;
+                    }
+                }
+                html += '</tbody></table>';
+                container.innerHTML = html;
+                
+                setTimeout(autoFitText, 50);
+
+            } catch (error) {
+                container.innerHTML = `<div style="color:#D32F2F; font-size:0.8rem; text-align:center; padding:10px;">요약 데이터를 불러오지 못했습니다.</div>`;
+            }
+        }
+
+        // ==========================================
+        // 5. 테이블 검색(필터) 로직 (다중 키워드 조건)
         // ==========================================
         function filterTable() {
             const input = document.getElementById("table-filter");
-            // 입력값을 소문자로 변환한 뒤, 띄어쓰기(공백)를 기준으로 나누어 배열로 만듭니다. (빈 검색어는 제거)
-            const keywords = input.value.toLowerCase().split(' ').filter(word => word.trim() !== '');
-            const tableBody = document.querySelector("#table-render-area table tbody");
-            
-            if (!tableBody) return; // 테이블이 렌더링되기 전이면 무시
+            const globalFilter = input.value.toLowerCase().split(' ').filter(word => word.trim() !== '');
+
+            const tableBody = document.getElementById("table-body");
+            if (!tableBody) return; 
             
             const rows = tableBody.getElementsByTagName("tr");
 
-            // 모든 행(Row)을 돌면서 검색어 포함 여부 확인
             for (let i = 0; i < rows.length; i++) {
-                const rowText = (rows[i].textContent || rows[i].innerText).toLowerCase();
-                let isMatch = true; // 기본적으로 일치한다고 가정
+                const cells = rows[i].getElementsByTagName("td");
+                if (cells.length === 0) continue;
 
-                // 사용자가 입력한 여러 개의 키워드를 하나씩 검사
-                for (let j = 0; j < keywords.length; j++) {
-                    // 키워드 중 하나라도 행 내용에 포함되어 있지 않으면 매칭 실패(false)
-                    if (rowText.indexOf(keywords[j]) === -1) {
-                        isMatch = false;
-                        break; // 더 이상 검사할 필요 없이 반복문 탈출
+                let rowMatchesGlobal = true;
+                if (globalFilter.length > 0) {
+                    const rowText = (rows[i].textContent || rows[i].innerText).toLowerCase();
+                    for (let j = 0; j < globalFilter.length; j++) {
+                        if (rowText.indexOf(globalFilter[j]) === -1) {
+                            rowMatchesGlobal = false;
+                            break;
+                        }
                     }
                 }
-                
-                // 모든 키워드가 포함되어 있으면(isMatch가 true) 보여주고, 아니면 숨김
-                if (isMatch) {
+
+                if (rowMatchesGlobal) {
                     rows[i].style.display = "";
                 } else {
                     rows[i].style.display = "none";
                 }
             }
+            setTimeout(autoFitText, 50);
+        }
+
+        // ==========================================
+        // 6. 스크롤 제어 (맨 위로 가기)
+        // ==========================================
+        window.addEventListener('scroll', function() {
+            const btn = document.getElementById("scrollTopBtn");
+            if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+                btn.classList.add("show");
+            } else {
+                btn.classList.remove("show");
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
         }
 
     </script>
 </body>
 </html>
-
