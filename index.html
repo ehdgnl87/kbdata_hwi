@@ -426,6 +426,8 @@
             <div class="tabs">
                 <button class="tab-btn active" id="btn-team" onclick="switchTab('team')">코드별</button>
                 <button class="tab-btn" id="btn-store" onclick="switchTab('store')">POS별</button>
+                <!-- [추가] 인원별 탭 버튼 (초기엔 숨김 처리) -->
+                <button class="tab-btn" id="btn-person" onclick="switchTab('person')" style="display: none;">인원별</button>
             </div>
             
             <!-- 테이블 검색(필터) 영역 -->
@@ -462,21 +464,22 @@
             9: "요금시뮬레이터"
         };
 
+        // [수정] 1, 4, 5, 6, 7, 8, 9번 지표에 'person' (인원별) 속성 추가
         const SHEET_URLS = {
-            1: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A10:E37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=A1:F101" },
-            2: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=G10:j37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=H1:l101" },
+            1: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A10:E37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=A1:F101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=A3:g352" },
+            2: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=G10:K37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=H1:M101" },
             3: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=m10:x37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=O1:AA101" },
-            4: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=z10:AE37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AC1:AI101" },
-            5: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A39:G66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AK1:AR101" },
-            6: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=I39:P66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AT1:BB101" },
-            7: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=R39:V66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BD1:BI101" },
-            8: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=X39:AB66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BK1:BP101" },
-            9: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=AD39:AH66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BR1:BW101" },
+            4: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=z10:AE37", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AC1:AI101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=i3:p352" },
+            5: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=A39:G66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AK1:AR101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=r3:z352" },
+            6: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=I39:P66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=AT1:BB101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=Ab3:aj352" },
+            7: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=R39:V66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BD1:BI101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=Al3:ar352" },
+            8: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=X39:AB66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BK1:BP101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=At3:ba352" },
+            9: { team: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=0&single=true&output=csv&range=AD39:AH66", store: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=640041693&single=true&output=csv&range=BR1:BW101", person: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=414789658&single=true&output=csv&range=bc3:bi352" },
         };
 
         const SECONDARY_SHEET_URLS = {
             1: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=A1:H12", 
-            2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=J1:n12",
+            2: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=J1:O12",
             3: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=Q1:X12",
             4: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=A14:I25",
             5: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR4W7tIBgONUu0PmC_8XopPApBHBSNlHkctSmcCkI_KzZ0CTgDKypeOPEx1mpelpkQCYHH36mnYnbji/pub?gid=796140350&single=true&output=csv&range=K14:P25",
@@ -525,30 +528,31 @@
             ]
         };
 
+        // [수정] 1, 4, 5, 6, 7, 8, 9번 지표에 'person' (인원별) 열 너비 추가
         const COLUMN_WIDTHS = {
-            1: { team: ["10%", "15%", "15%", "15%","15%"], store: ["10%", "15%", "20%", "15%", "15%", "15%"] },
+            1: { team: ["10%", "15%", "15%", "15%","15%"], store: ["10%", "15%", "20%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%"] },
             2: { team: ["10%", "15%", "15%", "15%", "15%"], store: ["10%", "15%", "15%", "15%", "15%", "15%"] },
             3: {
                 team: ["10%", "15%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%", "7%"],
                 store: ["10%", "15%", "15%","6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%", "6%"]
             },
-            4: { team: ["15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"] },
-            5: { team: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%", "15%"] },
-            6: { team: ["15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"], store: ["15%", "15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"] },
-            7: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] },
-            8: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] },
-            9: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"] }
+            4: { team: ["15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%","15%"] },
+            5: { team: ["15%", "15%", "15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%","15%","15%"] },
+            6: { team: ["15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"], store: ["15%", "15%", "15%", "15%", "8%", "8%", "8%", "8%", "8%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%","15%","15%"] },
+            7: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%"] },
+            8: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%","15%"] },
+            9: { team: ["15%", "15%", "15%", "15%", "15%"], store: ["15%", "15%", "15%", "15%", "15%", "15%"], person: ["15%", "15%", "15%", "10%", "15%", "15%","15%"] }
         };
 
+        // [수정] 1, 4, 5, 6, 7, 8, 9번 지표에 'person' (인원별) 목표값 강조 서식 추가
         const TARGET_RULES = {
-            1: { team: { 4: { under: 88, over: 100 } }, store: { 5: { under: 88, over: 100 } } },
-            2: { team: { 2:97 }, store: { 3:97} },
+            1: { team: { 4: { under: 88, over: 100 } }, store: { 5: { under: 88, over: 100 } }, person: { 6: { under: 88, over: 100 } } },
             3: { team: { 2: { under: 4, over: 3 } }, store: { 3: { under: 4, over: 3 } } }, 
-            5: { team: { 3: { over: 0 },4: { over: 0 } }, store: { 4: { over: 0 },6: { over: 0 } } },
-            6: { team: { 2: 95 }, store: { 3: 95 } },
-            7: { team: { 4: 55 }, store: { 5: 55 } },
-            8: { team: { 4: 80 }, store: { 5: 80 } },
-            9: { team: { 4: 20 }, store: { 5: 20 } }
+            5: { team: { 3: { over: 0 },4: { over: 0 } }, store: { 4: { over: 0 },6: { over: 0 } }, person: { 5: { over: 0 },7: { over: 0 } } },
+            6: { team: { 2: 95 }, store: { 3: 95 }, person: { 4: 95 } },
+            7: { team: { 4: 55 }, store: { 5: 55 }, person: { 6: 55 } },
+            8: { team: { 4: 80 }, store: { 5: 80 }, person: { 5: 1 } },
+            9: { team: { 4: 20 }, store: { 5: 20 }, person: { 6: 20 } }
         };
 
         // ==========================================
@@ -601,6 +605,21 @@
 
             document.getElementById('current-indicator-title').innerText = INDICATOR_NAMES[indicatorId] || `지표 ${indicatorId}`;
 
+            // [추가] 인원별 탭 표시/숨김 처리 로직
+            const personIndicators = [1, 4, 5, 6, 7, 8, 9];
+            const btnPerson = document.getElementById('btn-person');
+            if (personIndicators.includes(indicatorId)) {
+                btnPerson.style.display = 'block'; // 허용된 지표에서는 인원별 버튼 표시
+            } else {
+                btnPerson.style.display = 'none'; // 그 외 지표에서는 숨김
+                // 만약 현재 '인원별' 탭을 보고 있었다면 강제로 '코드별'로 이동
+                if (currentTab === 'person') {
+                    currentTab = 'team';
+                    document.getElementById('btn-team').classList.add('active');
+                    document.getElementById('btn-person').classList.remove('active');
+                }
+            }
+
             fetchSheetData();
             fetchSecondaryData(); 
         }
@@ -610,6 +629,7 @@
             
             document.getElementById('btn-team').classList.toggle('active', tabType === 'team');
             document.getElementById('btn-store').classList.toggle('active', tabType === 'store');
+            document.getElementById('btn-person').classList.toggle('active', tabType === 'person'); // 인원별 탭 추가 적용
 
             fetchSheetData();
         }
@@ -709,12 +729,19 @@
             }
         }
 
+        // [수정] 인원별(person) 탭 더미 데이터 지원 추가
         function generateDummyData(indicator, tab) {
             const isTeam = tab === 'team';
-            const header = isTeam ? "순위,조직명(팀),목표(만원),실적(만원),달성률" : "순위,조직명(매장),목표(만원),실적(만원),달성률";
-            const orgName1 = isTeam ? "강남영업1팀" : "강남본점";
-            const orgName2 = isTeam ? "강북영업2팀" : "홍대점";
-            const orgName3 = isTeam ? "경기남부팀" : "수원역점";
+            const isPerson = tab === 'person';
+            
+            const header = isTeam ? "순위,조직명(팀),목표(만원),실적(만원),달성률" : 
+                           isPerson ? "순위,담당자(인원),목표(만원),실적(만원),달성률" :
+                           "순위,조직명(매장),목표(만원),실적(만원),달성률";
+            
+            const orgName1 = isTeam ? "강남영업1팀" : isPerson ? "김철수" : "강남본점";
+            const orgName2 = isTeam ? "강북영업2팀" : isPerson ? "이영희" : "홍대점";
+            const orgName3 = isTeam ? "경기남부팀" : isPerson ? "박지민" : "수원역점";
+            
             const mult = indicator * 1000;
             return `${header}\n1,${orgName1},${5000 + mult},${5500 + mult},110%\n2,${orgName2},${4500 + mult},${4200 + mult},93%\n3,${orgName3},${6000 + mult},${5800 + mult},96%`;
         }
@@ -765,8 +792,8 @@
                             if (underVal !== undefined && numValue < underVal) {
                                 styles.push('color: #D32F2F; font-weight: bold;'); 
                             } else if (overVal !== undefined && numValue > overVal) {
-                                // [수정완료] 초과 시 파란색 강조 
-                                styles.push('color: #1976D2; font-weight: bold;'); 
+                                // 초과 시에도 미만일 때와 동일하게 빨간색으로 강조
+                                styles.push('color: #D32F2F; font-weight: bold;'); 
                             }
                         }
                     }
